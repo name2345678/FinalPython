@@ -1,2 +1,3 @@
 hello, it's me. i've been wondering about the thing we used to be
 i've been pondering... if we...
+היי היי היי
