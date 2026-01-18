@@ -19,12 +19,12 @@ def str_to_short_word_set(s : str)->set:
     word = ''
     while s_index < len(s):
         # count if word is under 5
-        if len(word) <= 5 and isalpha_eng(s[s_index]):
+        if len(word) < 5 and isalpha_eng(s[s_index]):
             word = word + s[s_index]
         # if over discard it and continue in string until seperator
-        elif len(word) > 5 and isalpha_eng(s[s_index]):
+        elif len(word) >= 5 and isalpha_eng(s[s_index]):
             word = ''
-            while isalpha_eng(s[s_index]): s_index += 1
+            while s_index < len(s) and isalpha_eng(s[s_index]): s_index += 1
         # if we got to seperator and word wasn't discarded (meaning it's valid) add it to set
         elif not isalpha_eng(s[s_index]) and word:
             # if word is 3-5 in length add it to set
@@ -52,6 +52,7 @@ def generate_anagrams(word : str)->list[str]:
     if len(word) == 1:
         return [word]
     anagrams = [word[i] + p for i in range(len(word)) for p in generate_anagrams(word[:i] + word[i + 1:])]
+    anagrams = list(set(anagrams))
     return anagrams
 
 def evaluate(guess : str, word : str)->int:
@@ -62,21 +63,33 @@ def evaluate(guess : str, word : str)->int:
         if word[i] == guess[i]: n+=1
     return n
 
+def filter_candidates(candidates: list[str], guess: str,feedback : int)->  list[str]:
+    l=[]
+    for c in  candidates:
+        if evaluate(guess,c) == feedback:
+            l.append(c)
+    return l
+
 #Main
 with open("story",'r') as f:
     s = ''.join(f.readlines())
 set_to_file("words",str_to_short_word_set(s))
 
 # Player 1 - get the random word
-rnd_word = gen_random_file_word("words")
+original_word= gen_random_file_word("words")
+print("Player 1 chose the word:"+original_word)
 # Player 2 (User) - get same length input word
-word = ''
-while len(word) != len(rnd_word) or not isalpha_eng(word):
-    word = input("Please enter a " + str(len(rnd_word)) + " length word containing only english letters: ")
-candidates = generate_anagrams(rnd_word) # Anagrams
-
+candidates = generate_anagrams(original_word) # Anagrams
+print("All anagrams of the word:",candidates,'\n')
 #Player2 guess:
-guess = random_str_list_element(candidates)
-print(evaluate(guess,rnd_word)) #test
-
-# Slopy????????
+after_filter=candidates
+while len(after_filter)>1:
+    guess = random_str_list_element(after_filter)
+    feedback = evaluate(guess,original_word)
+    print("Chosen word by player 2: "+guess)
+    print("Score:" , feedback)
+    after_filter = filter_candidates(after_filter, guess, feedback)
+    print("Filter:",after_filter)
+    print()
+if len(after_filter) == 1:
+    print("You got the right word!!!!!!! it's",after_filter[0])
