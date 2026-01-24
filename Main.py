@@ -15,9 +15,9 @@ def isalpha_eng(s: str) -> bool:
 
 
 # returns a random item from a string list
-def random_str_list_element(l: list[str]) -> str:
-    rnd_index = random.randint(0, len(l) - 1)
-    return l[rnd_index]
+def random_str_list_element(lst: list[str]) -> str:
+    rnd_index = random.randint(0, len(lst) - 1)
+    return lst[rnd_index]
 
 
 # puts 3-5 length words from string in set
